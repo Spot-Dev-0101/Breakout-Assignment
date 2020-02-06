@@ -18,6 +18,11 @@ public class Model
     public int BALL_SIZE      = 30;     // Ball side
     public int BRICK_WIDTH    = 50;     // Brick size
     public int BRICK_HEIGHT   = 30;
+    public int BRICK_AMOUNT = 150;
+    public int BRICK_TOPGAP = 50;
+    public int BRICK_XGAP = 10;
+    public int BRICK_YGAP = 10;
+    public int BRICK_MAXLIVES = 10;
 
     public int BAT_MOVE       = 5;      // Distance to move bat on each keypress
     public int BALL_MOVE      = 3;      // Units to move the ball on each step
@@ -36,7 +41,7 @@ public class Model
     public GameObj bat;                 // The bat
     public int score = 0;               // The score
 
-    // variables that control the game 
+    // variables that control the game
     public boolean gameRunning = true;  // Set false to stop the game
     public boolean fast = false;        // Set true to make the ball go faster
 
@@ -52,14 +57,28 @@ public class Model
         height = h;
     }
 
-    // Initialise the game - reset the score and create the game objects 
+    // Initialise the game - reset the score and create the game objects
     public void initialiseGame()
     {
         score = 0;
-        ball   = new GameObj(width/2, height/2, BALL_SIZE, BALL_SIZE, Color.RED );
+        ball   = new GameObj(width/2, height/2, BALL_SIZE, BALL_SIZE, Color.RED, 1);
         bat    = new GameObj(width/2, height - BRICK_HEIGHT*3/2, BRICK_WIDTH*3,
-                BRICK_HEIGHT/4, Color.GRAY);
+                BRICK_HEIGHT/4, Color.GRAY, 1);
         bricks = new ArrayList<>();
+        int y = 0;
+        int xCounter = 0;
+        for(int i = 1; i < BRICK_AMOUNT+1; i++){
+            int x = (BRICK_WIDTH+BRICK_XGAP)*xCounter;
+            if(x-(BRICK_WIDTH/2) >= width-BRICK_WIDTH){
+                y += BRICK_HEIGHT+BRICK_YGAP;
+                xCounter = 0;
+                x = (BRICK_WIDTH+BRICK_XGAP)*xCounter;
+            }
+            xCounter += 1;
+            int lives = (BRICK_MAXLIVES-(y/(BRICK_HEIGHT+BRICK_YGAP)+1)) + 1;
+            System.out.println(x + " " + y + " " + lives);
+            bricks.add(new GameObj(x+(BRICK_XGAP/2), BRICK_TOPGAP+y, BRICK_WIDTH, BRICK_HEIGHT, lerpColors(Color.GREEN, Color.BLUE, lives-1, BRICK_MAXLIVES), lives));
+        }
         // *[1]******************************************************[1]*
         // * Fill in code to add the bricks to the arrayList            *
         // **************************************************************
@@ -67,17 +86,17 @@ public class Model
     }
 
     // Animating the game
-    // The game is animated by using a 'thread'. Threads allow the program to do 
+    // The game is animated by using a 'thread'. Threads allow the program to do
     // two (or more) things at the same time. In this case the main program is
     // doing the usual thing (View waits for input, sends it to Controller,
-    // Controller sends to Model, Model updates), but a second thread runs in 
+    // Controller sends to Model, Model updates), but a second thread runs in
     // a loop, updating the position of the ball, checking if it hits anything
-    // (and changing direction if it does) and then telling the View the Model 
+    // (and changing direction if it does) and then telling the View the Model
     // changed.
 
     // When we use more than one thread, we have to take care that they don't
-    // interfere with each other (for example, one thread changing the value of 
-    // a variable at the same time the other is reading it). We do this by 
+    // interfere with each other (for example, one thread changing the value of
+    // a variable at the same time the other is reading it). We do this by
     // SYNCHRONIZING methods. For any object, only one synchronized method can
     // be running at a time - if another thread tries to run the same or another
     // synchronized method on the same object, it will stop and wait for the
@@ -138,8 +157,21 @@ public class Model
         // * Fill in code to check if a visible brick has been hit      *
         // * The ball has no effect on an invisible brick               *
         // * If a brick has been hit, change its 'visible' setting to   *
-        // * false so that it will 'disappear'                          * 
+        // * false so that it will 'disappear'                          *
         // **************************************************************
+
+        for(GameObj brick : bricks){
+            if(brick.visible && ball.hitBy(brick)){
+                hit = true;
+                if(brick.lives <= 1){
+                    brick.visible = false;
+                    addToScore(HIT_BRICK);
+                } else{
+                    brick.lives--;
+                    brick.color = lerpColors(brick.startingColor, Color.RED, brick.lives, brick.startingLives);
+                }
+            }
+        }
 
         if (hit)
             ball.changeDirectionY();
@@ -149,9 +181,17 @@ public class Model
             ball.changeDirectionY();
     }
 
+    public Color lerpColors(Color startColor, Color endColor, int currentvalue, int maxValue){
+
+        float value = ((float)currentvalue/(float)maxValue);
+        Color result = startColor.interpolate(endColor, value);
+        System.out.println(value + " " + currentvalue + " " + maxValue);
+        return result;
+    }
+
     // This is how the Model talks to the View
     // Whenever the Model changes, this method calls the update method in
-    // the View. It needs to run in the JavaFX event thread, and Platform.runLater 
+    // the View. It needs to run in the JavaFX event thread, and Platform.runLater
     // is a utility that makes sure this happens even if called from the
     // runGame thread
     public synchronized void modelChanged()
@@ -161,7 +201,7 @@ public class Model
 
 
     // Methods for accessing and updating values
-    // these are all synchronized so that the can be called by the main thread 
+    // these are all synchronized so that the can be called by the main thread
     // or the animation thread safely
 
     // Change game running state - set to false to stop the game
@@ -223,7 +263,11 @@ public class Model
     {
         int dist = direction * BAT_MOVE;    // Actual distance to move
         Debug.trace( "Model::moveBat: Move bat = " + dist );
-        bat.moveX(dist);
+        int newBatPosX = bat.topX + dist;
+        if(!(newBatPosX+bat.width > width) && !(newBatPosX-bat.width < -bat.width)){
+            bat.moveX(dist);
+        }
+
     }
 }   
     

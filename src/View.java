@@ -107,6 +107,12 @@ public class View implements EventHandler<KeyEvent>
             displayGameObj( gc, ball );   // Display the Ball
             displayGameObj( gc, bat  );   // Display the Bat
 
+            for(GameObj brick : bricks){
+                if(brick.visible){
+                    displayGameObj(gc, brick);
+                }
+            }
+
             // *[3]****************************************************[3]*
             // * Display the bricks that make up the game                 *
             // * Fill in code to display bricks from the ArrayList        *
@@ -120,7 +126,7 @@ public class View implements EventHandler<KeyEvent>
     // Display a game object - it is just a rectangle on the canvas
     public void displayGameObj( GraphicsContext gc, GameObj go )
     {
-        gc.setFill( go.colour );
+        gc.setFill( go.color );
         gc.fillRect( go.topX, go.topY, go.width, go.height );
     }
 

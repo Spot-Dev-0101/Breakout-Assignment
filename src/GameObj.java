@@ -10,18 +10,27 @@ public class GameObj
     public int topY   = 0;              // position - top left corner Y
     public int width  = 0;              // Width of object
     public int height = 0;              // Height of object
-    public Color colour;                // Colour of object
+    public Color color;                // Colour of object
     public int   dirX   = 1;            // Direction X (1 or -1)
     public int   dirY   = 1;            // Direction Y (1 or -1)
+    public int lives = 1;
+    public int startingLives = 1;
+    public Color startingColor;
 
 
-    public GameObj( int x, int y, int w, int h, Color c )
+    public GameObj( int x, int y, int w, int h, Color c, int l)
     {
         topX   = x;
         topY = y;
         width  = w;
         height = h;
-        colour = c;
+        color = c;
+        startingColor = c;
+        if(l <= 0){
+            l = 1;
+        }
+        lives = l;
+        startingLives = l;
     }
 
     // move in x axis
