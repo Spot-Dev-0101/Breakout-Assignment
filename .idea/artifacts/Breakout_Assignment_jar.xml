@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="Breakout-Assignment:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/Breakout_Assignment_jar</output-path>
+    <root id="archive" name="Breakout-Assignment.jar">
+      <element id="module-output" name="Breakout-Assignment" />
+    </root>
+  </artifact>
+</component>
