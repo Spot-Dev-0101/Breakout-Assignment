@@ -1,5 +1,6 @@
 
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 
 // The breakout controller receives KeyPress events from the GUI (via
 // the KeyEventHandler). It maps the keys onto methods in the model and
@@ -46,5 +47,9 @@ public class Controller
                 model.setGameRunning(false);
                 break;
         }
+    }
+
+    public void userMouseInteraction(MouseEvent event){
+        model.setBatXPos((int)event.getX());
     }
 }

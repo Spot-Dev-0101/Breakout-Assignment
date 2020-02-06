@@ -18,11 +18,11 @@ public class Model
     public int BALL_SIZE      = 30;     // Ball side
     public int BRICK_WIDTH    = 50;     // Brick size
     public int BRICK_HEIGHT   = 30;
-    public int BRICK_AMOUNT = 150;
+    public int BRICK_AMOUNT = 1;
     public int BRICK_TOPGAP = 50;
     public int BRICK_XGAP = 10;
     public int BRICK_YGAP = 10;
-    public int BRICK_MAXLIVES = 10;
+    public int BRICK_MAXLIVES = 1;
 
     public int BAT_MOVE       = 5;      // Distance to move bat on each keypress
     public int BALL_MOVE      = 3;      // Units to move the ball on each step
@@ -33,6 +33,7 @@ public class Model
     // The other parts of the model-view-controller setup
     View view;
     Controller controller;
+    GameState gameState;
 
     // The game 'model' - these represent the state of the game
     // and are used by the View to display it
@@ -40,9 +41,11 @@ public class Model
     public ArrayList<GameObj> bricks;   // The bricks
     public GameObj bat;                 // The bat
     public int score = 0;               // The score
+    public int bricksAlive = 99;
 
     // variables that control the game
-    public boolean gameRunning = true;  // Set false to stop the game
+    public boolean gameRunning = false;  // Set false to stop the game
+    public boolean gameLoopRunning =  true;
     public boolean fast = false;        // Set true to make the ball go faster
 
     // initialisation parameters for the model
@@ -76,9 +79,10 @@ public class Model
             }
             xCounter += 1;
             int lives = (BRICK_MAXLIVES-(y/(BRICK_HEIGHT+BRICK_YGAP)+1)) + 1;
-            System.out.println(x + " " + y + " " + lives);
+            //System.out.println(x + " " + y + " " + lives);
             bricks.add(new GameObj(x+(BRICK_XGAP/2), BRICK_TOPGAP+y, BRICK_WIDTH, BRICK_HEIGHT, lerpColors(Color.GREEN, Color.BLUE, lives-1, BRICK_MAXLIVES), lives));
         }
+        bricksAlive = BRICK_AMOUNT;
         // *[1]******************************************************[1]*
         // * Fill in code to add the bricks to the arrayList            *
         // **************************************************************
@@ -118,11 +122,14 @@ public class Model
         try
         {
             // set gameRunning true - game will stop if it is set false (eg from main thread)
-            setGameRunning(true);
-            while (getGameRunning())
+
+            while (getGameLoopRunning())
             {
-                updateGame();                        // update the game state
-                modelChanged();                      // Model changed - refresh screen
+                gameState.checkState();
+                if(getGameRunning()) {
+                    updateGame();                        // update the game state
+                    modelChanged();                      // Model changed - refresh screen
+                }
                 Thread.sleep( getFast() ? 10 : 20 ); // wait a few milliseconds
             }
         } catch (Exception e)
@@ -135,20 +142,22 @@ public class Model
     public synchronized void updateGame()
     {
         // move the ball one step (the ball knows which direction it is moving in)
-        ball.moveX(BALL_MOVE);
-        ball.moveY(BALL_MOVE);
-        // get the current ball possition (top left corner)
-        int x = ball.topX;
-        int y = ball.topY;
-        // Deal with possible edge of board hit
-        if (x >= width - B - BALL_SIZE)  ball.changeDirectionX();
-        if (x <= 0 + B)  ball.changeDirectionX();
-        if (y >= height - B - BALL_SIZE)  // Bottom
-        {
-            ball.changeDirectionY();
-            addToScore( HIT_BOTTOM );     // score penalty for hitting the bottom of the screen
+        if(ball.frozen == false) {
+            ball.moveX(BALL_MOVE);
+            ball.moveY(BALL_MOVE);
+            // get the current ball possition (top left corner)
+            int x = ball.topX;
+            int y = ball.topY;
+            // Deal with possible edge of board hit
+            if (x >= width - B - BALL_SIZE) ball.changeDirectionX();
+            if (x <= 0 + B) ball.changeDirectionX();
+            if (y >= height - B - BALL_SIZE)  // Bottom
+            {
+                ball.changeDirectionY();
+                addToScore(HIT_BOTTOM);     // score penalty for hitting the bottom of the screen
+            }
+            if (y <= 0 + M) ball.changeDirectionY();
         }
-        if (y <= 0 + M)  ball.changeDirectionY();
 
         // check whether ball has hit a (visible) brick
         boolean hit = false;
@@ -166,6 +175,7 @@ public class Model
                 if(brick.lives <= 1){
                     brick.visible = false;
                     addToScore(HIT_BRICK);
+                    bricksAlive--;
                 } else{
                     brick.lives--;
                     brick.color = lerpColors(brick.startingColor, Color.RED, brick.lives, brick.startingLives);
@@ -177,13 +187,13 @@ public class Model
             ball.changeDirectionY();
 
         // check whether ball has hit the bat
-        if ( ball.hitBy(bat) )
+        if (ball.visible && ball.hitBy(bat) )
             ball.changeDirectionY();
     }
 
     public Color lerpColors(Color startColor, Color endColor, int currentvalue, int maxValue){
 
-        float value = ((float)currentvalue/(float)maxValue);
+        float value = 1-((float)currentvalue/(float)maxValue);
         Color result = startColor.interpolate(endColor, value);
         System.out.println(value + " " + currentvalue + " " + maxValue);
         return result;
@@ -214,6 +224,11 @@ public class Model
     public synchronized Boolean getGameRunning()
     {
         return gameRunning;
+    }
+
+    public synchronized Boolean getGameLoopRunning()
+    {
+        return gameLoopRunning;
     }
 
     // Change game speed - false is normal speed, true is fast
@@ -268,6 +283,14 @@ public class Model
             bat.moveX(dist);
         }
 
+    }
+
+    public synchronized void setBatXPos(int pos){
+        //Debug.trace( "Model::moveBat: bat pos = " + pos );
+        int newBatPos = pos - bat.width/2;
+        if(!(newBatPos+bat.width > width) && !(newBatPos-bat.width < -bat.width)){
+            bat.setX(newBatPos);
+        }
     }
 }   
     

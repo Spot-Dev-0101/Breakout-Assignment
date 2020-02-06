@@ -16,6 +16,7 @@ public class GameObj
     public int lives = 1;
     public int startingLives = 1;
     public Color startingColor;
+    public boolean frozen = false;
 
 
     public GameObj( int x, int y, int w, int h, Color c, int l)
@@ -45,6 +46,14 @@ public class GameObj
         topY += units * dirY;
     }
 
+    public void setX(int pos){
+        topX = pos;
+    }
+
+    public void setY(int pos){
+        topY = pos;
+    }
+
     // change direction of movement in x axis (-1, 0 or +1)
     public void changeDirectionX()
     {
@@ -65,7 +74,7 @@ public class GameObj
         return ! ( topX >= obj.topX+obj.width     ||
                 topX+width <= obj.topX         ||
                 topY >= obj.topY+obj.height    ||
-                topY+height <= obj.topY );
+                topY+height <= obj.topY);
 
     }
 

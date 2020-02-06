@@ -1,6 +1,9 @@
 
 import java.util.ArrayList;
+
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Pos;
 import javafx.scene.input.*;
 import javafx.scene.canvas.*;
 import javafx.scene.control.*;
@@ -23,6 +26,7 @@ public class View implements EventHandler<KeyEvent>
     public Pane pane;       // basic layout pane
     public Canvas canvas;   // canvas to draw game on
     public Label infoText;  // info at top of screen
+    public Button pressPlayButton;
 
     // The other parts of the model-view-controller setup
     public Controller controller;
@@ -32,6 +36,8 @@ public class View implements EventHandler<KeyEvent>
     public GameObj   ball;           // The ball
     public ArrayList<GameObj> bricks;     // The bricks
     public int       score =  0;     // The score
+
+    public boolean mouseBatControl = false;
 
     // we don't really need a constructor method, but include one to print a
     // debugging message if required
@@ -67,6 +73,12 @@ public class View implements EventHandler<KeyEvent>
         infoText.setTranslateY(10);
         pane.getChildren().add(infoText);  // add label to the pane
 
+        pressPlayButton = new Button("Press Play");
+        pressPlayButton.setId("PlayButton");
+        pressPlayButton.setMinWidth(width/2);
+        pressPlayButton.setMinHeight(height/3);
+        pane.getChildren().add(pressPlayButton);
+
         // add the complete GUI to the scene
         Scene scene = new Scene(pane);
         scene.getStylesheets().add("breakout.css"); // tell the app to use our css file
@@ -74,6 +86,14 @@ public class View implements EventHandler<KeyEvent>
         // Add an event handler for key presses. We use the View object itself
         // and provide a handle method to be called when a key is pressed.
         scene.setOnKeyPressed(this);
+        scene.setOnMouseMoved(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                if(mouseBatControl == true) {
+                    controller.userMouseInteraction(event);
+                }
+            }
+        });
 
         // put the scene in the winodw and display it
         window.setScene(scene);
@@ -84,7 +104,9 @@ public class View implements EventHandler<KeyEvent>
     public void handle(KeyEvent event)
     {
         // send the event to the controller
-        controller.userKeyInteraction( event );
+        if(mouseBatControl == false) {
+            controller.userKeyInteraction(event);
+        }
     }
 
     // drawing the game
@@ -104,8 +126,12 @@ public class View implements EventHandler<KeyEvent>
             infoText.setText("BreakOut: Score = " + score);
 
             // draw the bat and ball
-            displayGameObj( gc, ball );   // Display the Ball
-            displayGameObj( gc, bat  );   // Display the Bat
+            if(ball.visible) {
+                displayGameObj(gc, ball);   // Display the Ball
+            }
+            if(bat.visible) {
+                displayGameObj(gc, bat);   // Display the Bat
+            }
 
             for(GameObj brick : bricks){
                 if(brick.visible){

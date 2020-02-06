@@ -32,11 +32,13 @@ public class Main extends Application
         Model model = new Model(W,H);
         View  view  = new View(W,H);
         Controller controller  = new Controller();
+        GameState gameState = new GameState(model);
 
         // Link them together so they can talk to each other
         // Each one has instance variables for the other two
         model.view = view;
         model.controller = controller;
+        model.gameState = gameState;
         controller.model = model;
         controller.view = view;
         view.model = model;
