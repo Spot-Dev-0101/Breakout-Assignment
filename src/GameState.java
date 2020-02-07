@@ -64,6 +64,7 @@ public class GameState{
                 case ALLBRICKSDESTROYED: {
                     //move on to something new
                     model.view.mouseBatControl = true;
+                    model.boss.visible = true;
                     break;
                 }
             }

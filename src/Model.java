@@ -40,6 +40,7 @@ public class Model
     public GameObj ball;                // The ball
     public ArrayList<GameObj> bricks;   // The bricks
     public GameObj bat;                 // The bat
+    public Boss boss;
     public int score = 0;               // The score
     public int bricksAlive = 99;
 
@@ -67,6 +68,8 @@ public class Model
         ball   = new GameObj(width/2, height/2, BALL_SIZE, BALL_SIZE, Color.RED, 1);
         bat    = new GameObj(width/2, height - BRICK_HEIGHT*3/2, BRICK_WIDTH*3,
                 BRICK_HEIGHT/4, Color.GRAY, 1);
+        boss = new Boss(width/2, 250, Color.RED);
+        boss.visible = true;
         bricks = new ArrayList<>();
         int y = 0;
         int xCounter = 0;
@@ -254,6 +257,8 @@ public class Model
     {
         return(ball);
     }
+
+    public synchronized Boss getBoss(){return boss;}
 
     // return bricks
     public synchronized ArrayList<GameObj> getBricks()

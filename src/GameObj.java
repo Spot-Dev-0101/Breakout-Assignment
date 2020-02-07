@@ -19,7 +19,7 @@ public class GameObj
     public boolean frozen = false;
 
 
-    public GameObj( int x, int y, int w, int h, Color c, int l)
+    public GameObj(int x, int y, int w, int h, Color c, int l)
     {
         topX   = x;
         topY = y;

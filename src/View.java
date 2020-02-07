@@ -36,6 +36,7 @@ public class View implements EventHandler<KeyEvent>
     public GameObj   ball;           // The ball
     public ArrayList<GameObj> bricks;     // The bricks
     public int       score =  0;     // The score
+    public Boss boss;
 
     public boolean mouseBatControl = false;
 
@@ -139,6 +140,10 @@ public class View implements EventHandler<KeyEvent>
                 }
             }
 
+            if(boss.visible){
+                displayGameObj(gc, boss);
+            }
+
             // *[3]****************************************************[3]*
             // * Display the bricks that make up the game                 *
             // * Fill in code to display bricks from the ArrayList        *
@@ -166,6 +171,7 @@ public class View implements EventHandler<KeyEvent>
         bricks  = model.getBricks();            // Bricks
         bat     = model.getBat();               // Bat
         score   = model.getScore();             // Score
+        boss    = model.getBoss();
         //Debug.trace("Update");
         drawPicture();                     // Re draw game
     }
