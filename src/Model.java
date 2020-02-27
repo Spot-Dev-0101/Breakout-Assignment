@@ -26,9 +26,12 @@ public class Model
 
     public int BAT_MOVE       = 5;      // Distance to move bat on each keypress
     public int BALL_MOVE      = 3;      // Units to move the ball on each step
+    public int BAT_WIDTH = 150;
+    public int BAT_HEIGHT = 10;
 
     public int HIT_BRICK      = 50;     // Score for hitting a brick
     public int HIT_BOTTOM     = -200;   // Score (penalty) for hitting the bottom of the screen
+    public int HIT_BOSS       = 25;
 
     // The other parts of the model-view-controller setup
     View view;
@@ -66,16 +69,17 @@ public class Model
     {
         score = 0;
         ball   = new GameObj(width/2, height/2, BALL_SIZE, BALL_SIZE, Color.RED, 1);
-        bat    = new GameObj(width/2, height - BRICK_HEIGHT*3/2, BRICK_WIDTH*3,
-                BRICK_HEIGHT/4, Color.GRAY, 1);
+        bat    = new GameObj(width/2, height - BRICK_HEIGHT*3/2, BAT_WIDTH,
+                BAT_HEIGHT, Color.GRAY, 1);
         boss = new Boss(width/2, 250, Color.RED);
-        boss.visible = true;
+        boss.visible = false;
         bricks = new ArrayList<>();
         int y = 0;
         int xCounter = 0;
+        //BRICK_XGAP = width/BRICK_AMOUNT;
         for(int i = 1; i < BRICK_AMOUNT+1; i++){
             int x = (BRICK_WIDTH+BRICK_XGAP)*xCounter;
-            if(x-(BRICK_WIDTH/2) >= width-BRICK_WIDTH){
+            if(x+(BRICK_WIDTH/1) >= width-BRICK_WIDTH){
                 y += BRICK_HEIGHT+BRICK_YGAP;
                 xCounter = 0;
                 x = (BRICK_WIDTH+BRICK_XGAP)*xCounter;
@@ -83,7 +87,7 @@ public class Model
             xCounter += 1;
             int lives = (BRICK_MAXLIVES-(y/(BRICK_HEIGHT+BRICK_YGAP)+1)) + 1;
             //System.out.println(x + " " + y + " " + lives);
-            bricks.add(new GameObj(x+(BRICK_XGAP/2), BRICK_TOPGAP+y, BRICK_WIDTH, BRICK_HEIGHT, lerpColors(Color.GREEN, Color.BLUE, lives-1, BRICK_MAXLIVES), lives));
+            bricks.add(new GameObj(x+(BRICK_XGAP), BRICK_TOPGAP+y, BRICK_WIDTH, BRICK_HEIGHT, lerpColors(Color.GREEN, Color.BLUE, lives-1, BRICK_MAXLIVES), lives));
         }
         bricksAlive = BRICK_AMOUNT;
         // *[1]******************************************************[1]*
@@ -144,6 +148,37 @@ public class Model
     // updating the game - this happens about 50 times a second to give the impression of movement
     public synchronized void updateGame()
     {
+        if(boss.visible){
+            boss.updateBullets();
+
+
+            if(boss.hitAndDirection(ball, boss)){
+                boss.lives -= 1;
+                boss.color = lerpColors(boss.startingColor, Color.BLACK, boss.lives, boss.startingLives);
+                score += HIT_BOSS;
+            }
+            if(boss.leg_left_top.hitAndDirection(ball, boss.leg_left_top)){
+                score += HIT_BOSS;
+                boss.leg_left_top.lives -= 1;
+                boss.leg_left_top.color = lerpColors(boss.leg_left_top.startingColor, Color.BLACK, boss.leg_left_top.lives, boss.leg_left_top.startingLives);
+            }
+            if(boss.leg_left_bottom.hitAndDirection(ball, boss.leg_left_bottom)){
+                score += HIT_BOSS;
+                boss.leg_left_bottom.lives -= 1;
+                boss.leg_left_bottom.color = lerpColors(boss.leg_left_bottom.startingColor, Color.BLACK, boss.leg_left_bottom.lives, boss.leg_left_bottom.startingLives);
+            }
+            if(boss.leg_right_top.hitAndDirection(ball, boss.leg_right_top)){
+                score += HIT_BOSS;
+                boss.leg_right_top.lives -= 1;
+                boss.leg_right_top.color = lerpColors(boss.leg_right_top.startingColor, Color.BLACK, boss.leg_right_top.lives, boss.leg_right_top.startingLives);
+            }
+            if(boss.leg_right_bottom.hitAndDirection(ball, boss.leg_right_bottom)){
+                score += HIT_BOSS;
+                boss.leg_right_bottom.lives -= 1;
+                boss.leg_right_bottom.color = lerpColors(boss.leg_right_bottom.startingColor, Color.BLACK, boss.leg_right_bottom.lives, boss.leg_right_bottom.startingLives);
+            }
+
+        }
         // move the ball one step (the ball knows which direction it is moving in)
         if(ball.frozen == false) {
             ball.moveX(BALL_MOVE);
@@ -173,8 +208,10 @@ public class Model
         // **************************************************************
 
         for(GameObj brick : bricks){
-            if(brick.visible && ball.hitBy(brick)){
-                hit = true;
+            if(brick.visible && brick.hitAndDirection(ball, brick)){
+
+
+
                 if(brick.lives <= 1){
                     brick.visible = false;
                     addToScore(HIT_BRICK);
@@ -186,12 +223,15 @@ public class Model
             }
         }
 
-        if (hit)
-            ball.changeDirectionY();
-
         // check whether ball has hit the bat
-        if (ball.visible && ball.hitBy(bat) )
+        if (ball.visible && ball.hitBy(bat) ){
+            System.out.println(ball.dirX + " " + bat.dirX);
+            if(ball.dirX != bat.dirX && bat.dirX != 0){
+                ball.changeDirectionX();
+            }
             ball.changeDirectionY();
+        }
+
     }
 
     public Color lerpColors(Color startColor, Color endColor, int currentvalue, int maxValue){
@@ -278,6 +318,8 @@ public class Model
         score += n;
     }
 
+
+
     // move the bat one step - -1 is left, +1 is right
     public synchronized void moveBat( int direction )
     {
@@ -285,6 +327,13 @@ public class Model
         Debug.trace( "Model::moveBat: Move bat = " + dist );
         int newBatPosX = bat.topX + dist;
         if(!(newBatPosX+bat.width > width) && !(newBatPosX-bat.width < -bat.width)){
+            if(newBatPosX > bat.topX){
+                bat.dirX = 1;
+            } else if(newBatPosX < bat.topX){
+                bat.dirX = -1;
+            } else{
+                bat.dirX = 0;
+            }
             bat.moveX(dist);
         }
 
@@ -294,7 +343,17 @@ public class Model
         //Debug.trace( "Model::moveBat: bat pos = " + pos );
         int newBatPos = pos - bat.width/2;
         if(!(newBatPos+bat.width > width) && !(newBatPos-bat.width < -bat.width)){
+            if(newBatPos > bat.topX){
+                bat.dirX = 1;
+            } else if(newBatPos < bat.topX){
+                bat.dirX = -1;
+            } else{
+                bat.dirX = 0;
+            }
+            //System.out.println(bat.dirX);
             bat.setX(newBatPos);
+        } else{
+            bat.dirX = 0;
         }
     }
 }   

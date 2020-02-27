@@ -44,6 +44,7 @@ public class Main extends Application
         view.model = model;
         view.controller = controller;
 
+
         // start up the GUI (view), and then tell the model to initialise itself
         // and start the game running
         view.start(window);

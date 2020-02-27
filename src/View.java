@@ -27,6 +27,8 @@ public class View implements EventHandler<KeyEvent>
     public Canvas canvas;   // canvas to draw game on
     public Label infoText;  // info at top of screen
     public Button pressPlayButton;
+    public Label winLabel;
+    public Label gameOverLabel;
 
     // The other parts of the model-view-controller setup
     public Controller controller;
@@ -38,7 +40,7 @@ public class View implements EventHandler<KeyEvent>
     public int       score =  0;     // The score
     public Boss boss;
 
-    public boolean mouseBatControl = false;
+    public boolean mouseBatControl = true;
 
     // we don't really need a constructor method, but include one to print a
     // debugging message if required
@@ -78,7 +80,19 @@ public class View implements EventHandler<KeyEvent>
         pressPlayButton.setId("PlayButton");
         pressPlayButton.setMinWidth(width/2);
         pressPlayButton.setMinHeight(height/3);
+        pressPlayButton.setTranslateX((width/2)-pressPlayButton.getMinWidth()/2);
+        pressPlayButton.setTranslateY((height/2)-pressPlayButton.getMinHeight()/2);
         pane.getChildren().add(pressPlayButton);
+
+        winLabel= new Label("Winner \nScore: " + score);
+        winLabel.setVisible(false);
+        winLabel.setTranslateX((width/2)-100);
+        pane.getChildren().add(winLabel);
+
+        gameOverLabel= new Label("Game Over \nScore: " + score);
+        gameOverLabel.setVisible(false);
+        gameOverLabel.setTranslateX((width/2)-100);
+        pane.getChildren().add(gameOverLabel);
 
         // add the complete GUI to the scene
         Scene scene = new Scene(pane);
@@ -126,6 +140,10 @@ public class View implements EventHandler<KeyEvent>
             // update score
             infoText.setText("BreakOut: Score = " + score);
 
+            winLabel.setText("Winner!!!! \n" + "Score: " + score);
+
+            gameOverLabel.setText("Game Over!!!! \n" + "Score: " + score);
+
             // draw the bat and ball
             if(ball.visible) {
                 displayGameObj(gc, ball);   // Display the Ball
@@ -141,7 +159,25 @@ public class View implements EventHandler<KeyEvent>
             }
 
             if(boss.visible){
+
+                if(boss.leg_left_top.visible){
+                    displayGameObj(gc, boss.leg_left_top);
+                }
+                if(boss.leg_left_bottom.visible){
+                    displayGameObj(gc, boss.leg_left_bottom);
+                }
+
+                if(boss.leg_right_top.visible){
+                    displayGameObj(gc, boss.leg_right_top);
+                }
+                if(boss.leg_right_bottom.visible){
+                    displayGameObj(gc, boss.leg_right_bottom);
+                }
                 displayGameObj(gc, boss);
+                for(GameObj bullet : boss.bullets){
+                    displayGameObj(gc, bullet);
+                }
+
             }
 
             // *[3]****************************************************[3]*

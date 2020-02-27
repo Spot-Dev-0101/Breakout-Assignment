@@ -78,4 +78,40 @@ public class GameObj
 
     }
 
+    public String hitByDirection(GameObj obj){
+        String result = "None";
+        if(topX+10 >= obj.topX+obj.width){
+            return "left";
+        }
+        if(topX+width-10 <= obj.topX){
+            return "right";
+        }
+        if(topY+10 >= obj.topY+obj.height){
+            return "top";
+        }
+        if(topY+height-10 <= obj.topY){
+            return "bottom";
+        }
+
+        return result;
+    }
+
+    public boolean hitAndDirection(GameObj from, GameObj on){
+        if(on.hitBy(from) && on.visible && from.visible) {
+            String hitSide = on.hitByDirection(from);
+            if (hitSide == "top" || hitSide == "bottom") {
+                from.changeDirectionY();
+            } else if (hitSide == "left" || hitSide == "right") {
+                from.changeDirectionX();
+            }
+            //System.out.println(hitSide);
+            return true;
+        }
+        return false;
+    }
+
+    public int dist(int a_x, int a_y, int b_x, int b_y){
+        return (int)Math.sqrt(Math.pow(a_x + b_x, 2) + Math.pow(a_y + b_y, 2));
+    }
+
 }
