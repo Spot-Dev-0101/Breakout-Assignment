@@ -11,8 +11,8 @@ public class GameObj
     public int width  = 0;              // Width of object
     public int height = 0;              // Height of object
     public Color color;                // Colour of object
-    public int   dirX   = 1;            // Direction X (1 or -1)
-    public int   dirY   = 1;            // Direction Y (1 or -1)
+    public double   dirX   = 1;            // Direction X (1 or -1)
+    public double   dirY   = 1;            // Direction Y (1 or -1)
     public int lives = 1;
     public int startingLives = 1;
     public Color startingColor;
@@ -78,6 +78,13 @@ public class GameObj
 
     }
 
+    /**
+     * Get the side an object is on
+     * Only works on the outside of the object
+     * @param obj
+     * @return string saying which side they are on
+     */
+    //There could be an issue if the object is 10 or smaller
     public String hitByDirection(GameObj obj){
         String result = "None";
         if(topX+10 >= obj.topX+obj.width){
@@ -96,9 +103,14 @@ public class GameObj
         return result;
     }
 
-    public boolean hitAndDirection(GameObj from, GameObj on){
-        if(on.hitBy(from) && on.visible && from.visible) {
-            String hitSide = on.hitByDirection(from);
+    /**
+     * Checks if the object has been hit, gets the side it was on and changes it's direction.
+     * @param from
+     * @return boolean if it has been hit
+     */
+    public boolean hitAndDirection(GameObj from){
+        if(hitBy(from) && visible && from.visible) {
+            String hitSide = hitByDirection(from);
             if (hitSide == "top" || hitSide == "bottom") {
                 from.changeDirectionY();
             } else if (hitSide == "left" || hitSide == "right") {
@@ -110,6 +122,14 @@ public class GameObj
         return false;
     }
 
+    /**
+     * Get the streight line distance from one set of coords to another
+     * @param a_x
+     * @param a_y
+     * @param b_x
+     * @param b_y
+     * @return an int distance
+     */
     public int dist(int a_x, int a_y, int b_x, int b_y){
         return (int)Math.sqrt(Math.pow(a_x + b_x, 2) + Math.pow(a_y + b_y, 2));
     }

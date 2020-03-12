@@ -1,30 +1,32 @@
-import javafx.application.Platform;
 import javafx.scene.paint.Color;
 
 public class GameState{
 
     public Model model;
 
+    // Enum of possible states the game can be in
     public enum states {
-        NONE,
-        MENU,
-        PRESSPLAY,
-        PLAYING,
-        ALLBRICKSDESTROYED,
-        BOSSPLAYING,
-        GAMEOVER,
-        WIN
+        NONE,                   // init
+        MENU,                   // The menu when the game starts
+        PRESSPLAY,              // When the player presses the play button
+        PLAYING,                // While the game is running
+        ALLBRICKSDESTROYED,     // When all bricks have been destroyed
+        BOSSPLAYING,            // While the boss level is rrunning
+        GAMEOVER,               // The player has lost the game
+        WIN                     // The player has won the game
     }
-    public states currentState = states.NONE;
-    private states lastState;
+    public states currentState = states.NONE;   // The current state of the game
+    private states lastState;                   // The previous state
 
     public GameState(Model m){
         model = m;
     }
 
+    //Constantly run checking what's going on in the game to decide when to move to a new state
     public void checkState(){
         switch(currentState){
             case NONE: {
+                // This is the init state so move to the menu
                 System.out.println(1);
                 enterState(states.MENU);
                 break;
@@ -38,6 +40,7 @@ public class GameState{
                 break;
             }
             case PLAYING:{
+                // wait for all the bricks to be destroyed
                 if(model.bricksAlive <= 0){
                     exitState(states.PLAYING);
                     enterState(states.ALLBRICKSDESTROYED);
@@ -45,6 +48,7 @@ public class GameState{
                 break;
             }
             case BOSSPLAYING:{
+                // Wait for the boss to be killed
                 if(model.boss.lives <= 0){
                     exitState(states.BOSSPLAYING);
                     enterState(states.WIN);
@@ -58,6 +62,7 @@ public class GameState{
                         }
                     }
                 }
+                // Check if each leg has lost it's life
                 if(model.boss.leg_left_top.lives <= 0){
                     model.boss.leg_left_top.visible = false;
                 }
@@ -71,6 +76,7 @@ public class GameState{
                     model.boss.leg_right_bottom.visible = false;
                 }
 
+                // If all the bosses legs have been destroyed change the bosses health, add more bullets and change it's color
                 if(!model.boss.leg_left_top.visible && !model.boss.leg_left_bottom.visible
                 && !model.boss.leg_right_top.visible && !model.boss.leg_right_bottom.visible && model.boss.allLegsDead == false){
                     model.boss.lives = 7;
@@ -83,8 +89,8 @@ public class GameState{
         }
     }
 
+    //Change the state of the game
     public void enterState(states state){
-
         if(state != lastState) {
             lastState = currentState;
             currentState = state;
@@ -105,11 +111,12 @@ public class GameState{
                     break;
                 }
                 case ALLBRICKSDESTROYED: {
+                    // change state to BOSSPLAYING
                     enterState(states.BOSSPLAYING);
                     break;
                 }
                 case BOSSPLAYING:{
-                    model.view.mouseBatControl = true;
+                    // draw the boss and change the direction of the ball
                     model.boss.visible = true;
                     model.ball.frozen = false;
                     model.ball.dirY = -1;
@@ -135,6 +142,7 @@ public class GameState{
 
     }
 
+    // Exit a state
     public void exitState(states state){
         if(currentState != lastState){
             System.out.println("Exited " + state);
@@ -145,6 +153,7 @@ public class GameState{
                     break;
                 }
                 case PLAYING:{
+                    // place the ball in the center of the screen at the bottom and freeze it
                     model.ball.frozen = true;
                     model.ball.setX((model.width/2)-model.BALL_SIZE/2);
                     model.ball.setY(model.height - 100);
@@ -153,6 +162,7 @@ public class GameState{
                     break;
                 }
                 case BOSSPLAYING:{
+                    // hide the boss, ball and bat
                     model.boss.visible = false;
                     model.bat.visible = false;
                     model.ball.visible = false;

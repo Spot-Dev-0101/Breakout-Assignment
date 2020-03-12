@@ -16,7 +16,7 @@ import javafx.stage.Stage;
 // The View class creates and manages the GUI for the application.
 // It doesn't know anything about the game itself, it just displays
 // the current state of the Model, and handles user input
-public class View implements EventHandler<KeyEvent>
+public class View
 {
     // variables for components of the user interface
     public int width;       // width of window
@@ -100,7 +100,6 @@ public class View implements EventHandler<KeyEvent>
 
         // Add an event handler for key presses. We use the View object itself
         // and provide a handle method to be called when a key is pressed.
-        scene.setOnKeyPressed(this);
         scene.setOnMouseMoved(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
@@ -113,15 +112,6 @@ public class View implements EventHandler<KeyEvent>
         // put the scene in the winodw and display it
         window.setScene(scene);
         window.show();
-    }
-
-    // Event handler for key presses - it just passes th event to the controller
-    public void handle(KeyEvent event)
-    {
-        // send the event to the controller
-        if(mouseBatControl == false) {
-            controller.userKeyInteraction(event);
-        }
     }
 
     // drawing the game
@@ -152,14 +142,16 @@ public class View implements EventHandler<KeyEvent>
                 displayGameObj(gc, bat);   // Display the Bat
             }
 
+            //draw all the visible bricks
             for(GameObj brick : bricks){
                 if(brick.visible){
                     displayGameObj(gc, brick);
                 }
             }
 
-            if(boss.visible){
 
+            if(boss.visible){
+                //display the boss's legs if the boss is visable
                 if(boss.leg_left_top.visible){
                     displayGameObj(gc, boss.leg_left_top);
                 }
@@ -174,6 +166,7 @@ public class View implements EventHandler<KeyEvent>
                     displayGameObj(gc, boss.leg_right_bottom);
                 }
                 displayGameObj(gc, boss);
+                //draw all the bullets
                 for(GameObj bullet : boss.bullets){
                     displayGameObj(gc, bullet);
                 }
@@ -207,7 +200,7 @@ public class View implements EventHandler<KeyEvent>
         bricks  = model.getBricks();            // Bricks
         bat     = model.getBat();               // Bat
         score   = model.getScore();             // Score
-        boss    = model.getBoss();
+        boss    = model.getBoss();              // Boss
         //Debug.trace("Update");
         drawPicture();                     // Re draw game
     }

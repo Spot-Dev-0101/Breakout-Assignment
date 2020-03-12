@@ -17,39 +17,8 @@ public class Controller
         Debug.trace("Controller::<constructor>");
     }
 
-    // This is how the View talks to the Controller
-    // AND how the Controller talks to the Model
-    // This method is called by the View to respond to key presses in the GUI
-    // The controller's job is to decide what to do. In this case it converts
-    // the keypresses into commands which are run in the model
-    public void userKeyInteraction(KeyEvent event )
-    {
-        Debug.trace("Controller::userKeyInteraction: keyCode = " + event.getCode() );
-
-        switch ( event.getCode() )
-        {
-            case LEFT:
-                model.moveBat( -1);
-                break;
-            case RIGHT:
-                model.moveBat( +1 );
-                break;
-            case F :
-                // Very fast ball movement
-                model.setFast(true);
-                break;
-            case N :
-                // Normal speed ball movement
-                model.setFast(false);
-                break;
-            case S :
-                // stop the game
-                model.setGameRunning(false);
-                break;
-        }
-    }
-
     public void userMouseInteraction(MouseEvent event){
+        // set the bat's x pos to the position of the mouse
         model.setBatXPos((int)event.getX());
     }
 }
