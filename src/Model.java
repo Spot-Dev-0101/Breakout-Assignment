@@ -18,7 +18,7 @@ public class Model
     public int BALL_SIZE      = 30;     // Ball side
     public int BRICK_WIDTH    = 50;     // Brick size
     public int BRICK_HEIGHT   = 30;     // Brick height
-    public int BRICK_AMOUNT = 27;       // Amount of bricks
+    public int BRICK_AMOUNT = 10;       // Amount of bricks
     public int BRICK_TOPGAP = 50;       // Distance from the top of the screen
     public int BRICK_XGAP = 10;         // Horozontal gap between bricks
     public int BRICK_YGAP = 10;         // Vertical gap between bricks
@@ -176,24 +176,25 @@ public class Model
             if (y <= 0 + M) ball.changeDirectionY();
         }
 
-
+        // Go through all the bricks and check if any have been hit by the ball
         for(GameObj brick : bricks){
             if(brick.visible && brick.hitAndDirection(ball)){
-                if(brick.lives <= 1){
+                if(brick.lives <= 1){// Hite the brick if it has lost all lives
                     brick.visible = false;
                     addToScore(HIT_BRICK);
                     bricksAlive--;
-                } else{
+                } else{ // Or remove a life and change it's color
                     brick.lives--;
                     brick.color = lerpColors(brick.startingColor, Color.RED, brick.lives, brick.startingLives);
                 }
             }
         }
 
+        // Check if the bat has been hit by the ball
         if (ball.visible && bat.hitAndDirection(ball) ){
-            System.out.println(ball.dirX + " " + bat.dirX);
+            //System.out.println(ball.dirX + " " + bat.dirX);
             if(ball.dirX != bat.dirX && bat.dirX != 0){
-                ball.changeDirectionX();
+                ball.dirX = -ball.dirX * bat.dirX;// Change ball dir based on the dir of the bat
             }
         }
 
@@ -302,24 +303,12 @@ public class Model
         //Debug.trace( "Model::moveBat: bat pos = " + pos );
         int newBatPos = pos - bat.width/2;
         if(!(newBatPos+bat.width > width) && !(newBatPos-bat.width < -bat.width)){
-            if(newBatPos > bat.topX){
-                bat.dirX = -sigmoid(newBatPos - bat.topX);
-            } else if(newBatPos < bat.topX){
-                bat.dirX = sigmoid(newBatPos - bat.topX);
-            } else{
-                bat.dirX = 0;
-            }
-
-            //System.out.println(bat.dirX);
+            bat.dirX = (newBatPos - bat.topX);
             bat.setX(newBatPos);
         } else{
             bat.dirX = 0;
         }
     }
 
-    // Simple sigmoid method
-    public double sigmoid(double x) {
-        return (1/( 1 + Math.pow(Math.E,(-1*x))));
-    }
 }   
     

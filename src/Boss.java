@@ -47,7 +47,10 @@ public class Boss extends GameObj {
         }
     }
 
-    //Spawn an amount of bullets
+    /**
+     * Add X amount of bullets
+     * @param amount
+     */
     public void addBullets(int amount){
         for(int i = 0; i < amount; i++){
             Random r = new Random();
