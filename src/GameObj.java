@@ -105,7 +105,7 @@ public class GameObj
 
     /**
      * Checks if the object has been hit, gets the side it was on and changes it's direction.
-     * @param from
+     * @param from the object that is being checked and changed
      * @return boolean if it has been hit
      */
     public boolean hitAndDirection(GameObj from){

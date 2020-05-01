@@ -22,7 +22,9 @@ public class GameState{
         model = m;
     }
 
-    //Constantly run checking what's going on in the game to decide when to move to a new state
+    /**
+     * Constantly check conditions and decide when to move the the next state
+     */
     public void checkState(){
         switch(currentState){
             case NONE: {
@@ -89,7 +91,10 @@ public class GameState{
         }
     }
 
-    //Change the state of the game
+    /**
+     * Run anything that is required to enter the next state
+     * @param state the state that is going to be entered
+     */
     public void enterState(states state){
         if(state != lastState) {
             lastState = currentState;
@@ -121,7 +126,7 @@ public class GameState{
                     model.ball.frozen = false;
                     model.ball.dirY = -1;
                     model.ball.dirX = -1;
-                    System.out.println(model.ball.dirX);
+                    //System.out.println(model.ball.dirX);
                     break;
                 }
                 case GAMEOVER:{
@@ -143,6 +148,11 @@ public class GameState{
     }
 
     // Exit a state
+
+    /**
+     * Run anything that is needed to exit a state
+     * @param state the state you are exiting
+     */
     public void exitState(states state){
         if(currentState != lastState){
             System.out.println("Exited " + state);

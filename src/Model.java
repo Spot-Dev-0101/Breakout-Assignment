@@ -179,7 +179,7 @@ public class Model
         // Go through all the bricks and check if any have been hit by the ball
         for(GameObj brick : bricks){
             if(brick.visible && brick.hitAndDirection(ball)){
-                if(brick.lives <= 1){// Hite the brick if it has lost all lives
+                if(brick.lives <= 1){// Hide the brick if it has lost all lives
                     brick.visible = false;
                     addToScore(HIT_BRICK);
                     bricksAlive--;
@@ -213,7 +213,7 @@ public class Model
 
         float value = 1-((float)currentvalue/(float)maxValue);
         Color result = startColor.interpolate(endColor, value);
-        System.out.println(value + " " + currentvalue + " " + maxValue);
+        //System.out.println(value + " " + currentvalue + " " + maxValue);
         return result;
     }
 
@@ -296,14 +296,15 @@ public class Model
 
     /**
      * Set the bat's X position and stop it from going off the edge
-     * Based on how fast the bat is moving the ball will deflect at a different speed and direction
-     * @param pos
+     * The bat's dirX is set to how fast it is moving
+     * @param pos Current mouse position
      */
     public synchronized void setBatXPos(int pos){
         //Debug.trace( "Model::moveBat: bat pos = " + pos );
         int newBatPos = pos - bat.width/2;
-        if(!(newBatPos+bat.width > width) && !(newBatPos-bat.width < -bat.width)){
-            bat.dirX = (newBatPos - bat.topX);
+        if(!(newBatPos+bat.width > width) && !(newBatPos-bat.width < -bat.width)){ // make sure the bat doesn't go off the screen
+            float dir = (newBatPos - bat.topX);
+            bat.dirX = dir;
             bat.setX(newBatPos);
         } else{
             bat.dirX = 0;

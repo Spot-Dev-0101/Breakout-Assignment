@@ -173,12 +173,6 @@ public class View
 
             }
 
-            // *[3]****************************************************[3]*
-            // * Display the bricks that make up the game                 *
-            // * Fill in code to display bricks from the ArrayList        *
-            // * Remember only a visible brick is to be displayed         *
-            // ************************************************************
-
 
         }
     }
