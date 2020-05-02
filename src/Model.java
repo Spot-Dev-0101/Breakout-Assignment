@@ -18,11 +18,11 @@ public class Model
     public int BALL_SIZE      = 30;     // Ball side
     public int BRICK_WIDTH    = 50;     // Brick size
     public int BRICK_HEIGHT   = 30;     // Brick height
-    public int BRICK_AMOUNT = 10;       // Amount of bricks
+    public int BRICK_AMOUNT = 1;       // Amount of bricks
     public int BRICK_TOPGAP = 50;       // Distance from the top of the screen
     public int BRICK_XGAP = 10;         // Horozontal gap between bricks
     public int BRICK_YGAP = 10;         // Vertical gap between bricks
-    public int BRICK_MAXLIVES = 2;      // Max amount of lives for a brick. Top layer has this amount. Each layer below has lower
+    public int BRICK_MAXLIVES = 1;      // Max amount of lives for a brick. Top layer has this amount. Each layer below has lower
 
     public int BAT_MOVE       = 5;      // Distance to move bat on each keypress
     public int BALL_MOVE      = 3;      // Units to move the ball on each step
@@ -304,6 +304,11 @@ public class Model
         int newBatPos = pos - bat.width/2;
         if(!(newBatPos+bat.width > width) && !(newBatPos-bat.width < -bat.width)){ // make sure the bat doesn't go off the screen
             float dir = (newBatPos - bat.topX);
+            if(dir > 1){
+                dir = 1;
+            } else if(dir < -1){
+                dir = -1;
+            }
             bat.dirX = dir;
             bat.setX(newBatPos);
         } else{

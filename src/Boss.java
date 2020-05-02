@@ -24,11 +24,11 @@ public class Boss extends GameObj {
         super(x-100, y-100, 200, 200, c, 25);
 
         // Create the 4 legs
-        leg_left_top = new GameObj(x-175, y, 75, 25, c, 3);
-        leg_left_bottom = new GameObj(x-175, y, 25, 125, c, 3);
+        leg_left_top = new GameObj(x-175, y, 75, 25, c, 1);
+        leg_left_bottom = new GameObj(x-175, y, 25, 125, c, 1);
 
-        leg_right_top = new GameObj(x+100, y, 75, 25, c, 3);
-        leg_right_bottom = new GameObj(x+150, y, 25, 125, c, 3);
+        leg_right_top = new GameObj(x+100, y, 75, 25, c, 1);
+        leg_right_bottom = new GameObj(x+150, y, 25, 125, c, 1);
 
         // Spawn the bullets
         addBullets(amountOfBullets);
@@ -54,7 +54,8 @@ public class Boss extends GameObj {
     public void addBullets(int amount){
         for(int i = 0; i < amount; i++){
             Random r = new Random();
-            bullets.add(new GameObj(r.nextInt((600 - 0) + 1) + 0, r.nextInt((0 - -1000) + 1) + -1000, BULLET_WIDTH, BULLET_HEIGHT, Color.BLUE, 1));
+            bullets.add(new GameObj(r.nextInt((600 - 0) + 1) + 0,
+            r.nextInt((0 - -1000) + 1) + -1000, BULLET_WIDTH, BULLET_HEIGHT, Color.BLUE, 1));
         }
     }
 
